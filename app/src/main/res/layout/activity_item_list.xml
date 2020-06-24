@@ -49,14 +49,14 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <Spinner
-                android:id="@+id/spinner"
+                android:id="@+id/make_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
 
                 />
 
             <Spinner
-                android:id="@+id/spinner2"
+                android:id="@+id/model_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="60dp" />
         </LinearLayout>
