@@ -53,7 +53,8 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
     private ProgressDialog pDialog;
     private Spinner makeSpinner;
     private Spinner modelSpinner;
-    private RecyclerView itemList;
+    //private RecyclerView itemList;
+    private View recyclerView;
 
 
     /**
@@ -72,6 +73,15 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
     StringBuilder carModelsURLString = new StringBuilder("https://thawing-beach-68207.herokuapp.com/carmodelmakes/");   // using String builder to exploit mutability
     private static String carModelsURL = "https://thawing-beach-68207.herokuapp.com/carmodelmakes/";   // invalid link without makeID appended to the end
 
+    // link to retreivable vehicles
+    // format of appending string /<make>/<model>/<zipcode>
+    // zipcode = 92603 (hardcoded zip)
+    //TODO: the url in part c is sending data as a json object and not an array!
+    // 3/23 are teslas
+    StringBuilder availableVehicleURLSting = new StringBuilder("https://thawing-beach-68207.herokuapp.com/cars/10/20/92603");
+    private static String availableVehicleURL = "https://thawing-beach-68207.herokuapp.com/cars/";
+    private static String zipCode = "92603";
+
     //----------------------------------------------------------------------------------------------
     // local storage
     //ArrayList<HashMap<String, String>> contactList;
@@ -79,6 +89,7 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
     private ArrayList<String>  makeArray;
     private ArrayList<HashMap<String,String>> carModelsList;
     private ArrayList<String> modelArray;
+    private ArrayList<HashMap<String,String>> vehiclesList;
 
 
 
@@ -91,7 +102,10 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
         makeArray = new ArrayList<>();
         carModelsList = new ArrayList<>();
         modelArray = new ArrayList<>();
+        vehiclesList = new ArrayList<>();
 
+        //itemList = findViewById(R.id.item_list);
+        recyclerView = findViewById(R.id.item_list);
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -123,7 +137,9 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
         new GetMake().execute();    // create a new thread to acquire contacts as JSON from a remote server
         //new GetModel().execute();
 
-        View recyclerView = findViewById(R.id.item_list);
+
+
+        //View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
     }
@@ -217,6 +233,9 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
 
         }
 
+
+
+
     }
 
     @Override
@@ -225,10 +244,18 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
     }
 
 
+    /**
+     * Method takes in a recyclerView and sets a data adapter on it to prepare it for data display
+     * and handling of the passed in back end data list
+     * @param recyclerView is the reycler view in the UI to init
+     */
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
     }
 
+    /**
+     *
+     */
     public static class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final ItemListActivity mParentActivity;
@@ -256,32 +283,50 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
             }
         };
 
+        /**
+         * Class constructor
+         * @param parent is the item list to populate
+         * @param items is the list of items to work with for data
+         * @param twoPane is used to control what display mode app is in
+         */
         SimpleItemRecyclerViewAdapter(ItemListActivity parent, List<DummyContent.DummyItem> items, boolean twoPane) {
             mValues = items;
             mParentActivity = parent;
             mTwoPane = twoPane;
         }
 
+        /*
+        create a new viewHolder instance
+         */
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_content, parent, false);
             return new ViewHolder(view);
         }
 
+        /*
+        Binds data from backend list to the view holder element that will be used to populate the recycler view
+         */
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mIdView.setText(mValues.get(position).id);   // set id to position #
+            holder.mContentView.setText(mValues.get(position).content); // get content from positon'th element in mValues list
 
             holder.itemView.setTag(mValues.get(position));
-            holder.itemView.setOnClickListener(mOnClickListener);
+            holder.itemView.setOnClickListener(mOnClickListener);   // click listener to listen for touch events
         }
 
+        // get amount of items to display
         @Override
         public int getItemCount() {
             return mValues.size();
         }
 
+        /*
+        class holds the data for a single cell in the recycler view
+        contains local fields storing desired data, and a constructor
+        to init and bind UI to components in the app
+         */
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView mIdView;
             final TextView mContentView;
