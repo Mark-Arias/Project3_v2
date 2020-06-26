@@ -398,10 +398,18 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
                             .commit();
                 } else {
                     Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                    //Intent intent = new Intent(context, ItemDetailActivity.class);
+                    //intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
 
-                    context.startActivity(intent);
+                    //context.startActivity(intent);
+                    Intent myIntent = new Intent(context, CarDetailsActivity.class);
+                    myIntent.putExtra("data",vehiclesList);
+                    //String temp = Integer.toString(position);
+                    // project works, but i need to figure out how to access length of recycler view and
+                    // its index
+                    myIntent.putExtra("position","0");
+                    context.startActivity(myIntent);
+
                 }
             }
         };
