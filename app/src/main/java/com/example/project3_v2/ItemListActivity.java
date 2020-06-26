@@ -481,12 +481,16 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
             //holder.itemView.setOnClickListener(mOnClickListener);   // click listener to listen for touch events
             holder.itemView.setOnClickListener(new View.OnClickListener() {
 
+                //TODO: Got fragments to work and not crash
+                // and on a specific position, need it to now load in a fragment designed to mimic the interface
+                // in the activities!
+                String temp = Integer.toString(position);
                 @Override
                 public void onClick(View view) {
-                    DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                    //DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                     if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                        Bundle arguments = new Bundle();    // object used to pass data via string keys
+                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, temp);
                         ItemDetailFragment fragment = new ItemDetailFragment();
                         fragment.setArguments(arguments);
                         mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -500,7 +504,7 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
 
                         Intent myIntent = new Intent(context, CarDetailsActivity.class);
                         myIntent.putExtra("data",vehiclesList);
-                        String temp = Integer.toString(position);
+                        //String temp = Integer.toString(position);
                         // project works, but i need to figure out how to access length of recycler view and
                         // its index
 
