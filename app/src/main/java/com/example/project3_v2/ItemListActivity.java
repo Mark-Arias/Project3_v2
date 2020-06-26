@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -234,9 +236,124 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
         }
 
 
+        // cases below checking for user selction of a specific model in the modelSpinner
+        // TODO: an ideal todo would be to try and refactor this code, and do less hardcoding and retrieve the make and model id info from the relavant hashmap objects
+        // will need to play around a bit to tinker with that and get that up and running
+        // Tesla Cases, make id = 3
+        switch (item) {
+            case "Model X": // model id = 23
+                populateList("3/23/");
+                break;
 
+            case "Model S": //model id = 3
+                populateList("3/3/");
+                break;
+            default:
+        }
+
+
+        // Lamborghini Cases, make id = 4
+        switch (item) {
+            case "Aventador": // model id = 8
+                populateList("4/8/");
+                break;
+            case "Huracan": //model id = 6
+                populateList("4/6/");
+                break;
+            case "Urus": //model id = 7
+                populateList("4/7/");
+                break;
+            default:
+        }
+
+
+        // Aston Martin Cases, make id = 10
+        switch (item) {
+            case "DB11": // model id = 21
+                populateList("10/21/");
+                break;
+            case "V12 Vantage": //model id = 20
+                populateList("10/20/");
+                break;
+            default:
+        }
+
+
+        // Bentley Cases, make id = 11
+        if ("Continental".equals(item)) { // model id = 22
+            populateList("11/22/");
+        }
+
+        // BMW Cases, make id = 9
+        if("M6".equals(item)) { // model id = 19
+            populateList("9/19/");
+        }
+
+        // Bugatti Cases, make id = 7       //TODO: case does not work
+        if("Chiron".equals(item)) { // model id = 12
+            populateList("7/12/");
+        }
+
+        // Maserati Cases, make id = 8
+        switch (item) {
+            case "GranTurismo": // model id = 13
+                populateList("8/13/");
+                break;
+            case "Levante": //model id = 14
+                populateList("8/14/");
+                break;
+            case "Syder": //model id = 15          //TODO: case does not work
+                populateList("8/15/");
+                break;
+            default:
+        }
+
+
+        // Ferrari Cases, make id = 5
+        switch (item) {
+            case "360": // model id = 4
+                populateList("5/4/");
+                break;
+            case "F430": //model id = 5
+                populateList("5/5/");
+                break;
+            default:
+        }
+
+
+        // Jaguar Cases, make id = 2
+        if("XJ".equals(item)) { // model id = 2
+            populateList("2/2/");
+        }
+
+
+        // Porsche Cases, make id = 6
+        switch (item) {
+            case "911": // model id = 9             //TODO: case does not work
+                populateList("6/9/");
+                break;
+            case "Boxter": //model id = 10
+                populateList("6/10/");
+                break;
+            case "Cayman": //model id = 11
+                populateList("6/11/");
+                break;
+            default:
+        }
 
     }
+
+
+    private void populateList(String modelInfo) {
+        //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+        availableVehicleURLSting.replace(0,availableVehicleURLSting.length(),availableVehicleURL);
+        //lv.clearChoices();
+        vehiclesList.clear();   // clear out old vehicle list data
+        availableVehicleURLSting.append(modelInfo);
+        availableVehicleURLSting.append(zipCode);
+        new GetAvailableVehicles().execute();
+    }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
@@ -586,6 +703,147 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
     }
 
     //----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Class performs an asyncrhonous remote server request for json data about
+     * the available cars for a specified car brand(make) and car model
+     */
+    private class GetAvailableVehicles extends AsyncTask<Void,Void,Void> {
+        /**
+         * actions to execute before invoking background thread
+         */
+        /*
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+         */
+
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            HttpHandler sh = new HttpHandler();     // create new httphandler instance
+            // Making a request to url and getting response
+            String jsonStr = sh.makeServiceCall(availableVehicleURLSting.toString());
+            Log.e(TAG, "Response from url: " + jsonStr);    // log the response from url to the terminal
+
+            if (jsonStr != null) {  // if not null, then connection made, and data was passed from service call to the url
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    JSONArray lists = jsonObj.getJSONArray("lists");    // convert json object to json array with specified name
+
+                    //vehiclesList.clear();   // clear out the hashmap for each new run of this code,
+
+                    // otherwise the list view gets cluttered with old calls info
+
+
+                    // looping through All list of vehicles
+                    for (int i = 0; i < lists.length(); i++) {
+                        JSONObject c = lists.getJSONObject(i);   // create a temp json object c, and set it the ith json object in lists
+
+                        // extract local fields from the json object
+                        String color = c.getString("color");
+                        String created_at = c.getString("created_at");
+                        String id = c.getString("id");
+                        String image_url = c.getString("image_url");
+                        String mileage = c.getString("mileage");
+                        String model = c.getString("model");
+                        String price = c.getString("price");
+                        String veh_description = c.getString("veh_description");
+                        String vehicle_make = c.getString("vehicle_make");
+                        String vehicle_url = c.getString("vehicle_url");
+                        String vin_number = c.getString("vin_number");
+                        //System.out.println(id);
+                        //System.out.println(model);
+                        //System.out.println(vehicle_make_id);
+
+                        // tmp hashmap for storing a single available vehicles list
+                        HashMap<String,String>  availableVehiclesList = new HashMap<>();
+
+                        // add each child node to HashMap key => value
+                        availableVehiclesList.put("color",color);
+                        availableVehiclesList.put("created_at",created_at);
+                        availableVehiclesList.put("id",id);
+                        availableVehiclesList.put("image_url",image_url);
+                        availableVehiclesList.put("mileage",mileage);
+
+                        availableVehiclesList.put("model",model);
+                        availableVehiclesList.put("price",price);
+                        availableVehiclesList.put("veh_description",veh_description);
+                        availableVehiclesList.put("vehicle_make",vehicle_make);
+                        availableVehiclesList.put("vehicle_url",vehicle_url);
+                        availableVehiclesList.put("vin_number",vin_number);
+
+                        vehiclesList.add(availableVehiclesList);
+
+                        // create a individual array later if needed to get simple access to some subfield info
+                        //modelArray.add(model);    // create an arraylist of only the models
+
+                    }
+
+
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());    // invalid json received from url
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() { // execute code snippet inside the main thread
+                            Toast.makeText(getApplicationContext(), "Json parsing error: " + e.getMessage(), Toast.LENGTH_LONG).show(); // create notific. toast
+                        }
+                    });
+
+                }
+            } else {
+                Log.e(TAG, "Couldn't get json from server.");   // connection was not sucesfully established
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Couldn't get json from server. Check LogCat for possible errors!", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }
+
+            return null;
+        }
+
+
+        /**
+         * Actions to perform after background thread has finished
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+
+
+            //lv.clearChoices();
+
+            //ListAdapter adapter = new SimpleAdapter(getApplicationContext(),vehiclesList,R.layout.list_item, new String []{"model", "price", "vin_number"},
+                   // new int[]{R.id.name,R.id.email,R.id.mobile});
+            //lv.setAdapter(adapter);
+
+            // call the adapter for my recycler view here???
+
+
+
+
+        }
+
+    }
 
 
 }
