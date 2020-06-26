@@ -58,6 +58,8 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
     //private RecyclerView itemList;
     private View recyclerView;
 
+    private int recyclerViewPosition = 0;
+
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -376,6 +378,8 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
      */
     public static class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
+        //private int recyclerViewPosition = 0;
+
         private final ItemListActivity mParentActivity;
         //private final List<DummyContent.DummyItem> mValues;
         private final ArrayList<HashMap<String,String>> vehiclesList;
@@ -384,9 +388,20 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
         // initiates the opening of a new window depending on type of device in use
         // TODO, need to work on this code to get the window launching to happen smoothly
         // and to even occur
+        /*
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
+
+
+
             @Override
             public void onClick(View view) {
+
+                //int position = (int) view.getTag();
+                //display toast with position of cardview in recyclerview list upon click
+                //Toast.makeText(view.getContext(),Integer.toString(position),Toast.LENGTH_SHORT).show();
+
+
+
                 DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
@@ -402,17 +417,22 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
                     //intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
 
                     //context.startActivity(intent);
+
+
                     Intent myIntent = new Intent(context, CarDetailsActivity.class);
                     myIntent.putExtra("data",vehiclesList);
-                    //String temp = Integer.toString(position);
+                    String temp = Integer.toString(recyclerViewPosition);
                     // project works, but i need to figure out how to access length of recycler view and
                     // its index
-                    myIntent.putExtra("position","0");
+
+                    myIntent.putExtra("position",temp);
                     context.startActivity(myIntent);
 
                 }
             }
         };
+
+         */
 
         /**
          * Class constructor
@@ -441,7 +461,7 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
         Binds data from backend list to the view holder element that will be used to populate the recycler view
          */
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
             //holder.mIdView.setText(mValues.get(position).id);   // set id to position #
             //holder.mContentView.setText(mValues.get(position).content); // get content from positon'th element in mValues list
 
@@ -450,10 +470,48 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
             holder.mIdView.setText(temp);
             holder.mContentView.setText(vehiclesList.get(position).get("model") + " " + vehiclesList.get(position).get("mileage"));
             // not sure what the line below does
-            //holder.itemView.setTag(vehiclesList.get(position));
+            //holder.itemView.setTag(position);
+            //holder.mContentView.setTag(position);
 
+            //System.out.println("**********");
+            //System.out.println(position);
+            //recyclerViewPosition = position;
+            holder.positionId = position;
 
-            holder.itemView.setOnClickListener(mOnClickListener);   // click listener to listen for touch events
+            //holder.itemView.setOnClickListener(mOnClickListener);   // click listener to listen for touch events
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                    if (mTwoPane) {
+                        Bundle arguments = new Bundle();
+                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                        ItemDetailFragment fragment = new ItemDetailFragment();
+                        fragment.setArguments(arguments);
+                        mParentActivity.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.item_detail_container, fragment)
+                                .commit();
+                    } else {
+                        Context context = view.getContext();
+                        //Intent intent = new Intent(context, ItemDetailActivity.class);
+                        //intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                        //context.startActivity(intent);
+
+                        Intent myIntent = new Intent(context, CarDetailsActivity.class);
+                        myIntent.putExtra("data",vehiclesList);
+                        String temp = Integer.toString(position);
+                        // project works, but i need to figure out how to access length of recycler view and
+                        // its index
+
+                        myIntent.putExtra("position",temp);
+                        context.startActivity(myIntent);
+
+                    }
+
+                }
+            });
+
         }
 
         // get amount of items to display
@@ -471,11 +529,13 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView mIdView;
             final TextView mContentView;
+            int positionId;
 
             ViewHolder(View view) {
                 super(view);
                 mIdView = (TextView) view.findViewById(R.id.id_text);
                 mContentView = (TextView) view.findViewById(R.id.content);
+                positionId = 0;
             }
         }
     }
