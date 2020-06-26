@@ -142,8 +142,9 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
 
 
         //View recyclerView = findViewById(R.id.item_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        // not sure if i need this code here
+        //assert recyclerView != null;
+        //setupRecyclerView((RecyclerView) recyclerView);
     }
 
 
@@ -367,7 +368,7 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
      * @param recyclerView is the reycler view in the UI to init
      */
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, vehiclesList, mTwoPane));
     }
 
     /**
@@ -376,8 +377,13 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
     public static class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final ItemListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        //private final List<DummyContent.DummyItem> mValues;
+        private final ArrayList<HashMap<String,String>> vehiclesList;
         private final boolean mTwoPane;
+
+        // initiates the opening of a new window depending on type of device in use
+        // TODO, need to work on this code to get the window launching to happen smoothly
+        // and to even occur
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -406,8 +412,10 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
          * @param items is the list of items to work with for data
          * @param twoPane is used to control what display mode app is in
          */
-        SimpleItemRecyclerViewAdapter(ItemListActivity parent, List<DummyContent.DummyItem> items, boolean twoPane) {
-            mValues = items;
+        //SimpleItemRecyclerViewAdapter(ItemListActivity parent, List<DummyContent.DummyItem> items, boolean twoPane) {
+        SimpleItemRecyclerViewAdapter(ItemListActivity parent, ArrayList<HashMap<String,String>> items, boolean twoPane) {
+            //mValues = items;
+            vehiclesList = items;
             mParentActivity = parent;
             mTwoPane = twoPane;
         }
@@ -426,17 +434,25 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
          */
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);   // set id to position #
-            holder.mContentView.setText(mValues.get(position).content); // get content from positon'th element in mValues list
+            //holder.mIdView.setText(mValues.get(position).id);   // set id to position #
+            //holder.mContentView.setText(mValues.get(position).content); // get content from positon'th element in mValues list
 
-            holder.itemView.setTag(mValues.get(position));
+            //holder.itemView.setTag(mValues.get(position));
+            String temp = Integer.toString(position);
+            holder.mIdView.setText(temp);
+            holder.mContentView.setText(vehiclesList.get(position).get("model") + " " + vehiclesList.get(position).get("mileage"));
+            // not sure what the line below does
+            //holder.itemView.setTag(vehiclesList.get(position));
+
+
             holder.itemView.setOnClickListener(mOnClickListener);   // click listener to listen for touch events
         }
 
         // get amount of items to display
         @Override
         public int getItemCount() {
-            return mValues.size();
+            //return mValues.size();
+            return vehiclesList.size();
         }
 
         /*
@@ -837,7 +853,8 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
             //lv.setAdapter(adapter);
 
             // call the adapter for my recycler view here???
-
+            assert recyclerView != null;
+            setupRecyclerView((RecyclerView) recyclerView);
 
 
 
