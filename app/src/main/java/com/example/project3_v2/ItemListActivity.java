@@ -489,6 +489,7 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
                 public void onClick(View view) {
                     //DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                     if (mTwoPane) {
+                        /*
                         Bundle arguments = new Bundle();    // object used to pass data via string keys
                         arguments.putString(ItemDetailFragment.ARG_ITEM_ID, temp);
                         ItemDetailFragment fragment = new ItemDetailFragment();
@@ -496,6 +497,26 @@ public class ItemListActivity extends AppCompatActivity implements AdapterView.O
                         mParentActivity.getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.item_detail_container, fragment)
                                 .commit();
+
+
+                         */
+
+                        // load in car detail fragment
+                        //CarDetailFragment carFrag = new CarDetailFragment();
+                        Bundle bundle = new Bundle();   // object used to pass data via string keys
+                        bundle.putSerializable("vehiclesListData",vehiclesList);      // pass arraylist with given identifier
+                        bundle.putString("positionKey",temp);
+                        //bundle.putString("key","value passed in to new frag");
+                        System.out.println("**********");
+                        System.out.println("Value in position is: ");
+                        System.out.println(position);
+                        System.out.println("**********");
+                        CarDetailFragment carFrag = CarDetailFragment.newInstance("car",position); //temp contains index of car to retrieve info about
+                        carFrag.setArguments(bundle);   // assign data bundle to new frag
+                        mParentActivity.getSupportFragmentManager().beginTransaction()  // launch fragment and init
+                                .replace(R.id.item_detail_container,carFrag)
+                                .commit();
+
                     } else {
                         Context context = view.getContext();
                         //Intent intent = new Intent(context, ItemDetailActivity.class);
